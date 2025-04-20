@@ -176,7 +176,7 @@ export default function App() {
                   {selectedFilters[filter] && (
                     <button
                       onClick={(e) => clearFilter(filter, e)}
-                      className="absolute right-2 top-[20%] -translate-y-[50%] p-1 rounded hover:bg-white/10"
+                      className="absolute right-2 top-[50%] -translate-y-[50%] p-1 rounded hover:bg-white/10"
                     >
                       <X className="w-4 h-4 text-white/70 hover:text-red-500" />
                     </button>
