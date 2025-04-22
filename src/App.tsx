@@ -126,8 +126,7 @@ export default function App() {
   return (
     <div className="bg-black min-w-screen min-h-screen text-white flex">
 
-      
-      <div className="w-16 h-full flex flex-col items-center justify-center py-4 space-y-8">
+      <div className="w-16 flex flex-col items-center justify-center h-screen space-y-8">
         {icons.map(({ Icon }, i) => (
           <div key={i} className="relative flex justify-center">
             <Icon className={`w-6 h-6 ${i === 0 ? 'text-white' : 'text-white/60'} transition`} />
@@ -193,7 +192,7 @@ export default function App() {
                   {selectedFilters[filter] && (
                     <button
                       onClick={(e) => clearFilter(filter, e)}
-                      className="absolute right-2 top-[20%] -translate-y-[50%] p-1 rounded hover:bg-white/10" //top offset for X
+                      className="absolute right-2 top-[50%] -translate-y-[50%] p-1 rounded hover:bg-white/10" //top offset for X
                     >
                       <X className="w-4 h-4 text-white/70 hover:text-red-500" />
                     </button>
