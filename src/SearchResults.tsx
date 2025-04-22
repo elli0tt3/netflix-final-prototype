@@ -116,7 +116,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({ selectedFilters })
     <div>
       <h2 className="text-3xl font-bold mb-4">Your Search Recommendations</h2>
       <div className="overflow-y-auto custom-scrollbar max-h-[calc(100vh-6rem)] pr-2">
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {posters.map((url, i) => (
             <div
               key={i}

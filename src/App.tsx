@@ -132,10 +132,10 @@ export default function App() {
         ))}
       </div>
 
-      <div className="flex-1 h-full px-6 py-6 flex gap-4">
+      <div className="flex flex-col lg:flex-row h-full w-full px-6 py-6 gap-8">
 
 
-        <div className="space-y-6 min-w-72 ml-2">
+        <div className="space-y-6 w-72 ml-2">
           <div className="grid grid-cols-6 gap-1">
             {keyboardRows.flat().map((key) => (
               <button
@@ -204,7 +204,7 @@ export default function App() {
           </div>
         </div>
         
-        <div className="flex-1 max-w-3/5 ml-auto">
+        <div className="w-full lg:flex-1 lg:max-w-3/5 ml-2 lg:ml-auto min-w-[300px]">
           <SearchResults selectedFilters={selectedFilters} />
         </div>
         
