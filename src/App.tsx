@@ -17,7 +17,10 @@ import {
   Shuffle,
   X
 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+
 import { SearchResults } from './SearchResults';
+import { QuizDialog } from './QuizDialog';
 
 const icons = [
   { Icon: Search },
@@ -96,6 +99,7 @@ const baseFilters = {
 
 export default function App() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({ 'Content Type': 'movie' });
+  const [quizOpen, setQuizOpen] = useState(false);
 
   const contentType = selectedFilters['Content Type'];
   const dynamicFilters = {
@@ -120,7 +124,9 @@ export default function App() {
   };
 
   return (
-    <div className="bg-black w-screen h-screen text-white flex">
+    <div className="bg-black min-w-screen min-h-screen text-white flex">
+
+      
       <div className="w-16 h-full flex flex-col items-center justify-center py-4 space-y-8">
         {icons.map(({ Icon }, i) => (
           <div key={i} className="relative flex justify-center">
@@ -130,8 +136,10 @@ export default function App() {
         ))}
       </div>
 
-      <div className="flex-1 h-full px-6 py-6 flex gap-8">
-        <div className="space-y-6 w-72 ml-auto">
+      <div className="flex flex-col lg:flex-row h-full w-full px-6 py-6 gap-8">
+
+
+        <div className="space-y-6 w-72 ml-2">
           <div className="grid grid-cols-6 gap-1">
             {keyboardRows.flat().map((key) => (
               <button
@@ -143,16 +151,25 @@ export default function App() {
             ))}
           </div>
 
-          {Object.values(selectedFilters).some(v => v) && (
-            <div className="flex justify-end mb-2">
+          <div className="flex justify-between mb-2">
+          <Button
+            onClick={() => setQuizOpen(true)}
+            variant="secondary"
+            className="text-sm h-8 bg-red-500 text-black hover:bg-red-600"
+          >
+            Take a Movie Quiz
+          </Button>
+
+
+            {Object.values(selectedFilters).some(v => v) && (
               <button
                 onClick={() => setSelectedFilters(Object.keys(dynamicFilters).reduce((acc, key) => ({ ...acc, [key]: '' }), {}))}
                 className="text-xs text-red-400 hover:text-red-200 underline"
               >
                 Clear All Filters
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="text-sm space-y-2 text-gray-300 mt-4">
             {Object.entries(dynamicFilters)
@@ -176,7 +193,7 @@ export default function App() {
                   {selectedFilters[filter] && (
                     <button
                       onClick={(e) => clearFilter(filter, e)}
-                      className="absolute right-2 top-[50%] -translate-y-[50%] p-1 rounded hover:bg-white/10"
+                      className="absolute right-2 top-[20%] -translate-y-[50%] p-1 rounded hover:bg-white/10" //top offset for X
                     >
                       <X className="w-4 h-4 text-white/70 hover:text-red-500" />
                     </button>
@@ -199,9 +216,20 @@ export default function App() {
             ))}
           </div>
         </div>
-
-        <SearchResults selectedFilters={selectedFilters} />
+        
+        <div className="w-full lg:flex-1 lg:max-w-3/5 ml-2 lg:ml-auto min-w-[300px]">
+          <SearchResults selectedFilters={selectedFilters} />
+        </div> 
       </div>
+      
+      <QuizDialog
+        open={quizOpen}
+        onClose={() => setQuizOpen(false)}
+        onApply={(filters: React.SetStateAction<Record<string, string>>) => {
+          setSelectedFilters(filters);
+          setQuizOpen(false);
+        }}
+      />
     </div>
   );
 }
