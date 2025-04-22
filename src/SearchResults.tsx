@@ -113,7 +113,7 @@ export const SearchResults: React.FC<SearchResultsProps> = ({ selectedFilters })
   }, [selectedFilters]);
 
   return (
-    <div className="flex-1 max-w-3/5 ml-auto">
+    <div>
       <h2 className="text-3xl font-bold mb-4">Your Search Recommendations</h2>
       <div className="overflow-y-auto custom-scrollbar max-h-[calc(100vh-6rem)] pr-2">
         <div className="grid grid-cols-5 gap-4">

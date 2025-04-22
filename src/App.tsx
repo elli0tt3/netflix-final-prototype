@@ -120,7 +120,9 @@ export default function App() {
   };
 
   return (
-    <div className="bg-black w-screen h-screen text-white flex">
+    <div className="bg-black min-w-screen min-h-screen text-white flex">
+
+      
       <div className="w-16 h-full flex flex-col items-center justify-center py-4 space-y-8">
         {icons.map(({ Icon }, i) => (
           <div key={i} className="relative flex justify-center">
@@ -130,8 +132,10 @@ export default function App() {
         ))}
       </div>
 
-      <div className="flex-1 h-full px-6 py-6 flex gap-8">
-        <div className="space-y-6 w-72 ml-auto">
+      <div className="flex-1 h-full px-6 py-6 flex gap-4">
+
+
+        <div className="space-y-6 min-w-72 ml-2">
           <div className="grid grid-cols-6 gap-1">
             {keyboardRows.flat().map((key) => (
               <button
@@ -176,7 +180,7 @@ export default function App() {
                   {selectedFilters[filter] && (
                     <button
                       onClick={(e) => clearFilter(filter, e)}
-                      className="absolute right-2 top-[50%] -translate-y-[50%] p-1 rounded hover:bg-white/10"
+                      className="absolute right-2 top-[20%] -translate-y-[50%] p-1 rounded hover:bg-white/10" //top offset for X
                     >
                       <X className="w-4 h-4 text-white/70 hover:text-red-500" />
                     </button>
@@ -199,8 +203,11 @@ export default function App() {
             ))}
           </div>
         </div>
-
-        <SearchResults selectedFilters={selectedFilters} />
+        
+        <div className="flex-1 max-w-3/5 ml-auto">
+          <SearchResults selectedFilters={selectedFilters} />
+        </div>
+        
       </div>
     </div>
   );
