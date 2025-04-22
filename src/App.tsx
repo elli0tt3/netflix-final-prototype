@@ -26,6 +26,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+
 import { SearchResults } from './SearchResults';
 
 const icons = [
@@ -106,6 +108,36 @@ const baseFilters = {
 export default function App() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({ 'Content Type': 'movie' });
   const [quizOpen, setQuizOpen] = useState(false);
+  const [quizStep, setQuizStep] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
+
+  const showTypeToGenreMovie: Record<string, string> = {
+    "Relaxing": "10751", // Family
+    "Thriller": "53",
+    "Comedy": "35",
+    "Romance": "10749",
+    "Educational": "99", // Documentary
+  };
+
+  const showTypeToGenreTV: Record<string, string> = {
+    "Relaxing": "10751", // Family
+    "Thriller": "80", // Crime
+    "Comedy": "35",
+    "Romance": "10766", // Soap
+    "Educational": "99", // Documentary
+  };
+
+  const timeToDuration: Record<string, string> = {
+    "Under 30 mins": "1",
+    "Around an hour": "2",
+    "A few hours": "3",
+    "I’m here all day": "4",
+  };
+
+  const typeToContent: Record<string, string> = {
+    "Show": "tv",
+    "Movie": "movie",
+  };
 
   const contentType = selectedFilters['Content Type'];
   const dynamicFilters = {
@@ -133,10 +165,32 @@ export default function App() {
     setSelectedFilters(Object.keys(baseFilters).reduce((acc, key) => ({ ...acc, [key]: '' }), {}));
     setQuizOpen(true);
   };
+
+  const cancelQuiz = () => {
+    setQuizStep(0);
+    setQuizAnswers({});
+    setQuizOpen(false);
+  };
   
-  const applyQuizResults = (results: Record<string, string>) => {
+  const applyQuizResults = (answers: Record<string, string>) => {
+    const results: Record<string, string> = {};
+    const contentType = typeToContent[answers['Content Type']];
+
+    if (answers['Show Type']) {
+      results['Genre'] = contentType === 'tv'
+        ? showTypeToGenreTV[answers['Show Type']]
+        : showTypeToGenreMovie[answers['Show Type']];
+    }
+    if (answers['Content Type']) {
+      results['Content Type'] = contentType;
+    }
+    if (answers['Duration']) {
+      results['Duration'] = timeToDuration[answers['Duration']];
+    }
     setSelectedFilters(results);
     setQuizOpen(false);
+    setQuizStep(0);
+    setQuizAnswers({});
   };
 
   return (
@@ -173,7 +227,7 @@ export default function App() {
             variant="secondary"
             className="text-sm h-8 bg-red-500 text-black hover:bg-red-600"
           >
-            Take a Quiz
+            Take a Movie Quiz
           </Button>
 
 
@@ -238,38 +292,119 @@ export default function App() {
         </div>
 
         <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
-          <DialogContent className="bg-[#1f1f1f] text-white">
-            <DialogHeader>
-              <DialogTitle>Quick Quiz</DialogTitle>
-            </DialogHeader>
+        <DialogContent className="bg-[#1f1f1f] text-white">
+          <DialogHeader>
+            <DialogTitle>Quick Quiz</DialogTitle>
+          </DialogHeader>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm">Do you prefer Movies or TV Series?</label>
-                <select
-                  className="w-full p-2 bg-black border border-white/20"
-                  onChange={(e) =>
-                    applyQuizResults({ 'Content Type': e.target.value })
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={quizStep}
+              initial={{ opacity: 0, x: 50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              {quizStep === 0 && (
+                <div>
+                  <p className="text-sm mb-2">What type of show are you looking for?</p>
+                  <div className="space-y-2">
+                    {["Relaxing", "Thriller", "Comedy", "Romance", "Educational"].map((option) => (
+                      <label key={option} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="showType"
+                          value={option}
+                          checked={quizAnswers['Show Type'] === option}
+                          onChange={(e) => setQuizAnswers(prev => ({ ...prev, 'Show Type': e.target.value }))}
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {quizStep === 1 && (
+                <div>
+                  <p className="text-sm mb-2">Do you want to see a show or movie?</p>
+                  <div className="space-y-2">
+                    {["Show", "Movie"].map((option) => (
+                      <label key={option} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="contentType"
+                          value={option}
+                          checked={quizAnswers['Content Type'] === option}
+                          onChange={(e) => setQuizAnswers(prev => ({ ...prev, 'Content Type': e.target.value }))}
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {quizStep === 2 && (
+                <div>
+                  <p className="text-sm mb-2">How much time do you have?</p>
+                  <div className="space-y-2">
+                    {["Under 30 mins", "Around an hour", "A few hours", "I’m here all day"].map((option) => (
+                      <label key={option} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="time"
+                          value={option}
+                          checked={quizAnswers['Duration'] === option}
+                          onChange={(e) => setQuizAnswers(prev => ({ ...prev, 'Duration': e.target.value }))}
+                        />
+                        {option}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
+
+          <DialogFooter className="mt-4">
+            <div className="flex gap-2">
+              {quizStep > 0 && (
+                <Button variant="secondary" onClick={() => setQuizStep(quizStep - 1)}>
+                  Back
+                </Button>
+              )}
+
+              {quizStep < 2 && (
+                <Button
+                  onClick={() => setQuizStep(quizStep + 1)}
+                  disabled={
+                    (quizStep === 0 && !quizAnswers['Show Type']) ||
+                    (quizStep === 1 && !quizAnswers['Content Type'])
                   }
                 >
-                  <option value="">Select...</option>
-                  <option value="movie">Movie</option>
-                  <option value="tv">TV Series</option>
-                </select>
-              </div>
-
-              {/* Add more questions here */}
-            </div>
-
-            <DialogFooter className="mt-4">
-              <DialogClose asChild>
-                <Button onClick={() => setQuizOpen(false)} variant="secondary">
-                  Cancel
+                  Next
                 </Button>
+              )}
+
+              {quizStep === 2 && (
+                <Button
+                  onClick={() => applyQuizResults(quizAnswers)}
+                  disabled={!quizAnswers['Duration']}
+                >
+                  Apply Filters
+                </Button>
+              )}
+
+              <DialogClose asChild>
+                <Button variant="ghost" onClick={cancelQuiz}>Cancel</Button>
               </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </div>
+          </DialogFooter>
+
+        </DialogContent>
+      </Dialog>
 
         
       </div>
