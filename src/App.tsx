@@ -17,6 +17,15 @@ import {
   Shuffle,
   X
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { SearchResults } from './SearchResults';
 
 const icons = [
@@ -96,6 +105,7 @@ const baseFilters = {
 
 export default function App() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({ 'Content Type': 'movie' });
+  const [quizOpen, setQuizOpen] = useState(false);
 
   const contentType = selectedFilters['Content Type'];
   const dynamicFilters = {
@@ -117,6 +127,16 @@ export default function App() {
   const clearFilter = (filter: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setSelectedFilters(prev => ({ ...prev, [filter]: '' }));
+  };
+
+  const openQuiz = () => {
+    setSelectedFilters(Object.keys(baseFilters).reduce((acc, key) => ({ ...acc, [key]: '' }), {}));
+    setQuizOpen(true);
+  };
+  
+  const applyQuizResults = (results: Record<string, string>) => {
+    setSelectedFilters(results);
+    setQuizOpen(false);
   };
 
   return (
@@ -147,16 +167,25 @@ export default function App() {
             ))}
           </div>
 
-          {Object.values(selectedFilters).some(v => v) && (
-            <div className="flex justify-end mb-2">
+          <div className="flex justify-between mb-2">
+          <Button
+            onClick={openQuiz}
+            variant="secondary"
+            className="text-sm h-8 bg-red-500 text-black hover:bg-red-600"
+          >
+            Take a Quiz
+          </Button>
+
+
+            {Object.values(selectedFilters).some(v => v) && (
               <button
                 onClick={() => setSelectedFilters(Object.keys(dynamicFilters).reduce((acc, key) => ({ ...acc, [key]: '' }), {}))}
                 className="text-xs text-red-400 hover:text-red-200 underline"
               >
                 Clear All Filters
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="text-sm space-y-2 text-gray-300 mt-4">
             {Object.entries(dynamicFilters)
@@ -207,6 +236,41 @@ export default function App() {
         <div className="w-full lg:flex-1 lg:max-w-3/5 ml-2 lg:ml-auto min-w-[300px]">
           <SearchResults selectedFilters={selectedFilters} />
         </div>
+
+        <Dialog open={quizOpen} onOpenChange={setQuizOpen}>
+          <DialogContent className="bg-[#1f1f1f] text-white">
+            <DialogHeader>
+              <DialogTitle>Quick Quiz</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm">Do you prefer Movies or TV Series?</label>
+                <select
+                  className="w-full p-2 bg-black border border-white/20"
+                  onChange={(e) =>
+                    applyQuizResults({ 'Content Type': e.target.value })
+                  }
+                >
+                  <option value="">Select...</option>
+                  <option value="movie">Movie</option>
+                  <option value="tv">TV Series</option>
+                </select>
+              </div>
+
+              {/* Add more questions here */}
+            </div>
+
+            <DialogFooter className="mt-4">
+              <DialogClose asChild>
+                <Button onClick={() => setQuizOpen(false)} variant="secondary">
+                  Cancel
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         
       </div>
     </div>
